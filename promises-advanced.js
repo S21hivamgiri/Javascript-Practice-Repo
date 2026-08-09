@@ -1,21 +1,20 @@
 // 1.Retries promise n number of promised
 function retriesPromisesNTimes(callback, n) {
-    return callback().catch((err)=>{
-        if(err){
-            if(n<=0) throw err;
-            retriesPromisesNTimes(callback, n-1);
-        }
-    })
+  return callback().catch((err) => {
+    if (err) {
+      if (n <= 0) throw err;
+
+      console.log(`Retrying ${n} times... ${n - 1} attempts left`);
+      return retriesPromisesNTimes(callback, n - 1);
+    }
+  });
 }
-retries(unResolvedApi, 3, 1000)
+
+retriesPromisesNTimes(unResolvedApi, 3, 1000)
   .then((data) => console.log(data))
   .catch((err) => console.error("Failed:", err));
 
-
-
-
-
-  // Utilities functions
+// Utilities functions
 function resolvedApi() {
   return fetch("https://6a71b85ef687776c13f098d3.mockapi.io/test/user").then(
     (response) => {
