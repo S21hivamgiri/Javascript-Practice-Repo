@@ -101,3 +101,15 @@ function abc() {
 }
 abc()
 console.log(man);// XYZ as this points to global objects
+
+
+let abc = (() => {
+    function xyz() {
+        this.man = "XYZ";    // sets global.man
+    }
+    xyz();
+    this.man = "ABC";        // sets module.exports.man
+})()
+console.log(this == module.exports); //true
+console.log(module.exports.man); // ABC
+console.log(global.man)//XYZ
