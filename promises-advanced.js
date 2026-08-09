@@ -1,3 +1,15 @@
+//2. Promise Timeout
+const promiseTimeout = (promise, timeout) => {
+  const promise2 = new Promise((resolve, reject) => {
+    setTimeout(() => reject("Timeout"), timeout);
+  });
+  return Promise.race([promise, promise2]);
+};
+
+promiseTimeout(resolvedDelayedApi(2000), 1000)
+  .then((data) => console.log(data))
+  .catch((err) => console.error("Failed:", err));
+
 // 1.Retries promise n number of promised
 function retriesPromisesNTimes(callback, n) {
   return callback().catch((err) => {
