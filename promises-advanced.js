@@ -1,3 +1,30 @@
+// 6. Throttle time
+const throttlefn = (callback, delay) => {
+  exec = true;
+  return (...args) => {
+    if (exec) {
+      exec = false;
+      callback(...args);
+      setTimeout(() => {
+        exec = true;
+      }, delay);
+    }
+  };
+};
+
+const throttle = throttlefn((data) => console.log(data), 2000);
+throttle("Hello, World!");
+setTimeout(() => {
+  throttle("Hello, World! 1");
+}, 1000);
+setTimeout(() => {
+  throttle("Hello, World! 2");
+}, 3500);
+setTimeout(() => {
+  throttle("Hello, World! 3");
+}, 2500);
+
+// 5. n Concurrent Promise at a particular time
 const concurrentNPromises = (tasks, n, finalCallback) => {
   if (tasks.length === 0) {
     return finalCallback(null, []);
