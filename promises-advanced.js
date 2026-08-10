@@ -1,37 +1,65 @@
 const promises = [
   resolvedDelayedApi(800),
-  unResolvedDelayedApi(500),
+  resolvedDelayedApi(500),
   resolvedDelayedApi(300),
   unResolvedDelayedApi(700),
-  unResolvedDelayedApi(200),
+  resolvedDelayedApi(200),
 ];
 
-
-// 12. Promise.any impl.
-const customPromiseAny = (promises) => {
-  return new Promise((resolve, reject) => {
-    let total = 0
-    const errs=[];
+// 13. Promise.allSettled impl.
+const customPromiseAllSettled = (promises) => {
+  return new Promise((resolved, reject) => {
+    let total = 0;
+    const results = [];
     for (let i = 0; i < promises.length; ++i) {
       promises[i]
         .then((result) => {
-          resolve(result)
-        })
-        .catch((err) => {
           ++total;
-          errs[i]=err;
-          unResolvedDelayedApi
+          results[i] = { result, status: "fulfilled" };
+          unResolvedDelayedApi;
           if (total === promises.length) {
-            reject(errs);
+            resolved(results);
+          }
+        })
+        .catch((reason) => {
+          ++total;
+          results[i] = { reason, status: "rejected" };
+          unResolvedDelayedApi;
+          if (total === promises.length) {
+            resolved(results);
           }
         });
     }
   });
 };
 
-Promise.any(promises).then(console.log).catch(console.log);
-customPromiseAny(promises).then(console.log).catch(console.log);
+Promise.allSettled(promises).then(console.log).catch(console.log);
+customPromiseAllSettled(promises).then(console.log).catch(console.log);
 
+// // 12. Promise.any impl.
+// const customPromiseAny = (promises) => {
+//   return new Promise((resolve, reject) => {
+//     let total = 0;
+//     const errs = [];
+//     for (let i = 0; i < promises.length; ++i) {
+//       promises[i]
+//         .then((result) => {
+//           resolve(result);
+//         })
+//         .catch((err) => {
+//           ++total;
+//           errs[i] = err;
+//           unResolvedDelayedApi;
+//           if (total === promises.length) {
+//             reject(errs);
+//           }
+//         });
+//     }
+//   });
+// };
+
+// Promise.any(promises).then(console.log).catch(console.log);
+// customPromiseAny(promises).then(console.log).catch(console.log);
 
 // // 11. Promise.race impl.
 // const customPromiseRace = (promises) => {
