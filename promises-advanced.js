@@ -1,34 +1,60 @@
-// 10. Promise.all impl.
-const customPromiseAll = (promises) => {
+// 11. Promise.race impl.
+const customPromiseRace = (promises) => {
   return new Promise((resolve, reject) => {
-    const results = [];
-    let total =0;
     for (let i = 0; i < promises.length; ++i) {
       promises[i]
         .then((result) => {
-          results[i] = result;
-          ++total;
-          if (total === promises.length) {
-            resolve(results);
-          }
+          resolve(result);
         })
         .catch((err) => {
-          reject("Error");
+          reject(err);
         });
     }
   });
 };
 
-const tasks = [
-  resolvedDelayedApi(3000),
+const promises = [
+  unResolvedDelayedApi(3000),
   resolvedDelayedApi(500),
-  resolvedDelayedApi(300),
+  unResolvedDelayedApi(300),
   resolvedDelayedApi(700),
-  resolvedDelayedApi(200),
+  unResolvedDelayedApi(200),
 ];
 
-Promise.all(tasks).then(console.log).catch(console.log);
-customPromiseAll(tasks).then(console.log).catch(console.log);
+Promise.race(promises).then(console.log).catch(console.log);
+customPromiseRace(promises).then(console.log).catch(console.log);
+
+// 10. Promise.all impl.
+// const customPromiseAll = (promises) => {
+//   return new Promise((resolve, reject) => {
+//     const results = [];
+//     let total = 0;
+//     for (let i = 0; i < promises.length; ++i) {
+//       promises[i]
+//         .then((result) => {
+//           results[i] = result;
+//           ++total;
+//           if (total === promises.length) {
+//             resolve(results);
+//           }
+//         })
+//         .catch((err) => {
+//           reject(err);
+//         });
+//     }
+//   });
+// };
+
+// const tasks = [
+//   unResolvedDelayedApi(3000),
+//   resolvedDelayedApi(500),
+//   resolvedDelayedApi(300),
+//   resolvedDelayedApi(700),
+//   resolvedDelayedApi(200),
+// ];
+
+// Promise.all(tasks).then(console.log).catch(console.log);
+// customPromiseAll(tasks).then(console.log).catch(console.log);
 
 // // 9. Sequential promise execution
 // function sequentialPromises(promises) {
