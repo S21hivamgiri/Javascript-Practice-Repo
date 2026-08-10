@@ -12,7 +12,7 @@ let t = [
 // console.log("|    " + t[2].name +"              " + t[2].price  +    "           |");
 // console.log("|__________________________________|");
 
-var u, p;
+let u, p;
 console.log("____________________________________");
 console.log("|" + "       Name    " + "  |    Price       |");
 console.log("|_________________|________________|");
