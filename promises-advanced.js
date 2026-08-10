@@ -1,21 +1,41 @@
-//8. Polling
-function polling(callback, interval, i = 1) {
-  console.log(`Polling attempt ${i}`);
-
-  return callback().then((data) => {
-    if (data.ok) {
-      console.log("Polling successful");
-      return data;
-    }
-
-    return new Promise((resolve) => {
-      setTimeout(resolve, interval);
-    }).then(() => polling(callback, interval, i + 1));
-  });
+// Sequential promise execution
+function sequentialPromises(promises) {
+  return promises.reduce((acc, curr) => {
+    return acc.then((results) => {
+      return curr().then((result) => {
+        results.push(result);
+        return result
+      });
+    });
+  }, Promise.resolve([]));
 }
-polling(resolvedOnCountApi(), 1000)
-  .then((data) => console.log(data))
-  .catch((err) => console.error("Failed: ", err));
+
+sequentialPromises([resolvedApi, resolvedApi])
+  .then((results) => {
+    console.log("All promises resolved:", results);
+  })
+  .catch((err) => {
+    console.error("Error in promises:", err);
+  });
+
+// //8. Polling
+// function polling(callback, interval, i = 1) {
+//   console.log(`Polling attempt ${i}`);
+
+//   return callback().then((data) => {
+//     if (data.ok) {
+//       console.log("Polling successful");
+//       return data;
+//     }
+
+//     return new Promise((resolve) => {
+//       setTimeout(resolve, interval);
+//     }).then(() => polling(callback, interval, i + 1));
+//   });
+// }
+// polling(resolvedOnCountApi(), 1000)
+//   .then((data) => console.log(data))
+//   .catch((err) => console.error("Failed: ", err));
 
 // // 7. Exponential Backoff with retries
 // const promiseExponentialBackoffWithRetries = (
