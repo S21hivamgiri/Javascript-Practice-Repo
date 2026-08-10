@@ -1,11 +1,73 @@
+const concurrentNPromises = (tasks, n, finalCallback) => {
+  if (tasks.length === 0) {
+    return finalCallback(null, []);
+  }
+
+  let counter = 0;
+  let completedCount = 0;
+  let hasError = false;
+
+  const len = tasks.length;
+  const results = new Array(len);
+
+  function runNextWorker() {
+    if (counter >= len || hasError) return;
+
+    const index = counter;
+    console.log("Executing task index: " + index);
+    counter++;
+
+    tasks[index]()
+      .then((result) => {
+        if (hasError) return;
+        console.log("Executed: " + index);
+        results[index] = result;
+        completedCount++; // Increment on success
+        if (completedCount === len) {
+          return finalCallback(null, results);
+        }
+        // Pick up the next task in the queue
+        runNextWorker();
+      })
+      .catch((err) => {
+        if (hasError) return;
+        hasError = true;
+        return finalCallback(err, null);
+      });
+  }
+
+  const initialWorkers = Math.min(n, len);
+  for (let i = 0; i < initialWorkers; i++) {
+    runNextWorker();
+  }
+};
+
+const tasks = [
+  () => resolvedDelayedApi(3000),
+  () => resolvedDelayedApi(500),
+  () => resolvedDelayedApi(300),
+  () => resolvedDelayedApi(700),
+  () => resolvedDelayedApi(200),
+];
+
+// Execute max 2 at a time
+concurrentNPromises(tasks, 2, (err, results) => {
+  if (err) {
+    console.error("Batch operation failed:", err.message);
+  } else {
+    console.log("All results in order:", results);
+  }
+});
+
 // 4. Debounce Timer
 const debounceTimer = (callback, delay) => {
   let timerId;
-  return (...args)=>{
-    clearTimeout(timerId)
-    timerId= setTimeout(callback(...args),delay)
-  }
+  return (...args) => {
+    clearTimeout(timerId);
+    timerId = setTimeout(callback(...args), delay);
+  };
 };
+
 const debounce = debounceTimer((data) => console.log(data), 2000);
 debounce("Hello, World!");
 setTimeout(() => {
@@ -15,7 +77,6 @@ setTimeout(() => {
   debounce("Hello, World! 2");
 }, 3500);
 debounce("Hello, World! 3");
-
 
 //3. Timeout with retries
 const promiseTimeoutWithRetries = (callback, timeout, retryLimit) => {
@@ -32,7 +93,7 @@ const promiseTimeoutWithRetries = (callback, timeout, retryLimit) => {
       ),
     );
   });
-}
+};
 promiseTimeoutWithRetries(unResolvedApi, 1000, 3)
   .then((data) => console.log(data))
   .catch((err) => console.error("Failed: ", err));
