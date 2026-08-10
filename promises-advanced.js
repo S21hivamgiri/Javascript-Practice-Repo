@@ -1,34 +1,53 @@
-// Exponential Backoff with retries
-const promiseExponentialBackoffWithRetries = (
-  callback,
-  timeout,
-  retryLimit,
-  i = 0,
-) => {
-  return callback().catch((err) => {
-    if (i>retryLimit) return err;
-    console.log(`retryng ${i} times with ${(timeout * 2**i)}s`);
-    return new Promise((resolve, reject) => {
-      setTimeout(
-        () => {
-          return promiseExponentialBackoffWithRetries(
-            callback,
-            timeout,
-            retryLimit,
-            ++i,
-          )
-            .then(resolve)
-            .catch(reject);
-        },
-        timeout * 2 ** i,
-      );
-    });
-  });
-};
+//8. Polling
+function polling(callback, interval, i = 1) {
+  console.log(`Polling attempt ${i}`);
 
-promiseExponentialBackoffWithRetries(unResolvedApi, 1000, 3)
+  return callback().then((data) => {
+    if (data.ok) {
+      console.log("Polling successful");
+      return data;
+    }
+
+    return new Promise((resolve) => {
+      setTimeout(resolve, interval);
+    }).then(() => polling(callback, interval, i + 1));
+  });
+}
+polling(resolvedOnCountApi(), 1000)
   .then((data) => console.log(data))
   .catch((err) => console.error("Failed: ", err));
+
+// // 7. Exponential Backoff with retries
+// const promiseExponentialBackoffWithRetries = (
+//   callback,
+//   timeout,
+//   retryLimit,
+//   i = 0,
+// ) => {
+//   return callback().catch((err) => {
+//     if (i > retryLimit) return err;
+//     console.log(`retryng ${i} times with ${timeout * 2 ** i}s`);
+//     return new Promise((resolve, reject) => {
+//       setTimeout(
+//         () => {
+//           return promiseExponentialBackoffWithRetries(
+//             callback,
+//             timeout,
+//             retryLimit,
+//             ++i,
+//           )
+//             .then(resolve)
+//             .catch(reject);
+//         },
+//         timeout * 2 ** i,
+//       );
+//     });
+//   });
+// };
+
+// promiseExponentialBackoffWithRetries(unResolvedApi, 1000, 3)
+//   .then((data) => console.log(data))
+//   .catch((err) => console.error("Failed: ", err));
 
 // // 6. Throttle time
 // const throttlefn = (callback, delay) => {
@@ -240,4 +259,17 @@ function unResolvedDelayedApi(delay) {
         .catch(reject);
     }, delay);
   });
+}
+
+function resolvedOnCountApi() {
+  let attempts = 0;
+  return () =>
+    new Promise((resolve) => {
+      attempts++;
+
+      resolve({
+        ok: attempts >= 5,
+        attempts,
+      });
+    });
 }
