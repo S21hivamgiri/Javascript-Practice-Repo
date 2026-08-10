@@ -1,22 +1,54 @@
-// Sequential promise execution
-function sequentialPromises(promises) {
-  return promises.reduce((acc, curr) => {
-    return acc.then((results) => {
-      return curr().then((result) => {
-        results.push(result);
-        return result
-      });
-    });
-  }, Promise.resolve([]));
-}
-
-sequentialPromises([resolvedApi, resolvedApi])
-  .then((results) => {
-    console.log("All promises resolved:", results);
-  })
-  .catch((err) => {
-    console.error("Error in promises:", err);
+// 10. Promise.all impl.
+const customPromiseAll = (promises) => {
+  return new Promise((resolve, reject) => {
+    const results = [];
+    let total =0;
+    for (let i = 0; i < promises.length; ++i) {
+      promises[i]
+        .then((result) => {
+          results[i] = result;
+          ++total;
+          if (total === promises.length) {
+            resolve(results);
+          }
+        })
+        .catch((err) => {
+          reject("Error");
+        });
+    }
   });
+};
+
+const tasks = [
+  resolvedDelayedApi(3000),
+  resolvedDelayedApi(500),
+  resolvedDelayedApi(300),
+  resolvedDelayedApi(700),
+  resolvedDelayedApi(200),
+];
+
+Promise.all(tasks).then(console.log).catch(console.log);
+customPromiseAll(tasks).then(console.log).catch(console.log);
+
+// // 9. Sequential promise execution
+// function sequentialPromises(promises) {
+//   return promises.reduce((acc, curr) => {
+//     return acc.then((results) => {
+//       return curr().then((result) => {
+//         results.push(result);
+//         return result
+//       });
+//     });
+//   }, Promise.resolve([]));
+// }
+
+// sequentialPromises([resolvedApi, resolvedApi])
+//   .then((results) => {
+//     console.log("All promises resolved:", results);
+//   })
+//   .catch((err) => {
+//     console.error("Error in promises:", err);
+//   });
 
 // //8. Polling
 // function polling(callback, interval, i = 1) {
