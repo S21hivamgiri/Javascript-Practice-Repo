@@ -2,8 +2,12 @@
 <html>
 <script src="./timing.js"></script>
 <script src="./two-way-bind.js" defer></script>
+<script src="./promise-with-dom.js" defer></script>
 
 <body>
+    <button id="resolver">I will resolve Promise</button>
+    <span id="log1" />
+
     Debounce: <input type="text" onkeyup="callData()">
     Audit Time:<input type="text" onkeyup="callAuditData()">
     Throttling:<input type="text" onkeyup="callThrottleData()">
