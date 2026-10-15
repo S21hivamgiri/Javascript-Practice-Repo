@@ -46,11 +46,6 @@ class Application {
     this.button = uiFactory.createButton();
     this.checkbox = uiFactory.createCheckbox();
   }
-
-  paint() {
-    console.log(this.button.render());
-    console.log(this.checkbox.render());
-  }
 }
 
 function run(currentOS) {
